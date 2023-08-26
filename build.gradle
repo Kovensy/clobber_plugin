@@ -1,0 +1,97 @@
+plugins {
+//    id 'java-gradle-plugin'
+    id 'groovy'
+    id 'maven-publish' //<=4.2 apply plugin "maven"
+}
+
+repositories {
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs',includes: ['*.jar'])
+    implementation gradleApi()
+    implementation localGroovy()
+//    implementation 'com.android.tools.build:gradle:8.1.1'//<=4.2 需要
+
+}
+
+
+/**
+ *  二选一 gradlePlugin 或者 publishing
+ *  ① ：gradlePlugin
+ *   1.1：plugins中需要 ：id 'java-gradle-plugin'
+ *   1.2：使用gradlePlugin属性中的plugins
+ *
+ *  ②：publishing中MavenPublication 搭配 resources的META-INF.gradle-plugins文件夹中声明id.properties
+ *  内容：
+ *    implementation-class=com.clobber.plugin.MyPlugin
+ */
+
+//<editor-fold desc="① ：gradlePlugin">
+
+//gradlePlugin {
+//    plugins {
+//        plugin_1 {
+//            id = 'com.clobber.plugin'
+//            group = 'com.clobber.plugin'
+//            version = '1.0.0'
+//            implementationClass = 'kovensy.clobber.plugin.LifeCyclePlugin'
+//        }
+//    }
+//}
+//</editor-fold>
+
+//<editor-fold desc="②：publishing中MavenPublication">
+
+
+//<editor-fold desc="可选插件group和version">
+//可以直接脚本中声明groupid 和 版本号
+//group "kovensy.lifecycle.plugin"
+//version "1.0.0"
+//</editor-fold>
+
+//<editor-fold desc="4.2之前">
+//uploadArchives{
+//    repositories.mavenDeployer {
+//        pom.groupId = 'com.clobber.plugin'
+//        pom.artifactId = 'com.clobber.plugin.gradle.plugin'//是groupid 和.gradle.plugin 拼接
+//        pom.version = '1.0.0'
+//        repository(url: uri('../clobber_plugin_local_repo'))
+//    }
+//}
+//
+//
+//uploadArchives{ //当前项目可以发布到本地文件夹中 搭配脚本中的group 和version
+//    repositories {
+//        mavenDeployer {
+//            repository(url: uri('../clobber_plugin_local_repo')) //定义本地maven仓库的地址
+//        }
+//    }
+//}
+//</editor-fold>
+
+//<editor-fold desc="Arctic Fox版本之后">
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.clobber.plugin'
+            artifactId = 'com.clobber.plugin.gradle.plugin'//是groupid 和.gradle.plugin 拼接
+            version = '1.0.0'
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url = '../clobber_plugin_local_repo'
+        }
+    }
+}
+//</editor-fold>
+//</editor-fold>
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
